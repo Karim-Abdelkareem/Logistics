@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import AppError from "./utils/AppError.js";
 import globalErrorHandler from "./controllers/error.controller.js";
 import userRoutes from "./router/user.router.js";
@@ -13,6 +14,7 @@ dotenv.config();
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
+app.use(cors());
 
 // Routes
 
