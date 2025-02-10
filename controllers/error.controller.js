@@ -3,29 +3,30 @@ import AppError from "../utils/AppError.js";
 // Handle MongoDB CastError (invalid ID)
 const handleCastError = (err) => {
   const message = `Invalid ${err.path}: ${err.value}.`;
-  return new AppError(400, message);
+  return new AppError(message, 400);
 };
 
 // Handle MongoDB duplicate key error
 const handleDuplicateError = (err) => {
-  const value = Object.keys(err.keyValue)[0];
-  const message = `Duplicate field value: ${err.keyValue[value]}. Please use another value.`;
-  return new AppError(400, message);
+  const field = Object.keys(err.keyValue)[0];
+  const value = err.keyValue[field];
+  const message = `Duplicate field: '${field}' with value '${value}'. Please use another value.`;
+  return new AppError(message, 400);
 };
 
 // Handle MongoDB validation errors
 const handleValidationError = (err) => {
   const errors = Object.values(err.errors).map((val) => val.message);
-  const message = `Invalid input data. ${errors.join(". ")}`;
-  return new AppError(400, message);
+  const message = `Invalid input data: ${errors.join(". ")}`;
+  return new AppError(message, 400);
 };
 
 // Send detailed error response in development
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
-    error: err,
     message: err.message,
+    error: err,
     stack: err.stack,
   });
 };
@@ -35,10 +36,10 @@ const sendErrorProd = (err, res) => {
   if (err.isOperational) {
     res.status(err.statusCode).json({
       status: err.status,
-      message: err,
+      message: err.message,
     });
   } else {
-    console.error("ERROR:", err);
+    console.error("❌ ERROR:", err);
     res.status(500).json({
       status: "error",
       message: "Something went wrong! Please try again later.",
@@ -54,12 +55,12 @@ export default (err, req, res, next) => {
   if (process.env.NODE_ENV === "development") {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
-    let error = Object.assign({}, err); // Copy error properties
+    let error = { ...err, message: err.message };
 
     // Handle specific MongoDB errors
-    if (error.name === "CastError") error = handleCastError(error);
-    if (error.code === 11000) error = handleDuplicateError(error);
-    if (error.name === "ValidationError") error = handleValidationError(error);
+    if (err.name === "CastError") error = handleCastError(err);
+    if (err.code === 11000) error = handleDuplicateError(err);
+    if (err.name === "ValidationError") error = handleValidationError(err);
 
     sendErrorProd(error, res);
   }

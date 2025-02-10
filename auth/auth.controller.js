@@ -8,7 +8,7 @@ export const signup = catchAsync(async (req, res, next) => {
   // Check if username already exists
   let existingUser = await userModel.findOne({ email: req.body.email });
   if (existingUser) {
-    return next(new AppError(400, "Username already exists"));
+    return next(new AppError("Username already exists", 400));
   }
 
   // Create new user
@@ -26,7 +26,7 @@ export const login = catchAsync(async (req, res, next) => {
   const user = await userModel.findOne({ email: email });
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return next(new AppError(401, "Invalid email or password"));
+    return next(new AppError("Invalid email or password", 401));
   }
   const token = jwt.sign(
     {
