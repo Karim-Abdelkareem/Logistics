@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import AppError from "./utils/AppError.js";
 import globalErrorHandler from "./controllers/error.controller.js";
 import userRoutes from "./router/user.router.js";
+import authRouter from "./router/auth.router.js";
 import dbconnection from "./database/dbConnection.js";
 
 const app = express();
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRoutes);
 
 app.all("*", (req, res, next) => {
