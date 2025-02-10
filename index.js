@@ -14,6 +14,14 @@ dotenv.config();
 app.use(express.json());
 
 // Routes
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Welcome to Limetless Logistic API!",
+  });
+});
+
 app.use("/api/v1/users", userRoutes);
 
 app.all("*", (req, res, next) => {
