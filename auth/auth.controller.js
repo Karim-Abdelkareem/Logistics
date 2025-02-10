@@ -1,4 +1,4 @@
-import { userModel } from "../database/models/user.model.js";
+import userModel from "../database/models/user.model.js";
 import AppError from "../utils/AppError.js";
 import catchAsync from "../utils/catchAsync.js";
 import bcrypt from "bcrypt";
