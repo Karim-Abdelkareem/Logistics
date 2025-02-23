@@ -5,8 +5,10 @@ import AppError from "./utils/AppError.js";
 import globalErrorHandler from "./controllers/error.controller.js";
 import userRoutes from "./router/user.router.js";
 import authRouter from "./router/auth.router.js";
+import shippingRoutes from "./router/shipping.router.js";
 import dbconnection from "./database/dbConnection.js";
 
+// create server instance
 const app = express();
 
 // Load environment variables from .env file
@@ -14,6 +16,8 @@ dotenv.config();
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
+
+// Enable CORS for cross-origin requests
 app.use(cors());
 
 // Routes
@@ -27,6 +31,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/shipping", shippingRoutes);
 
 app.all("*", (req, res, next) => {
   next(new AppError(404, `Can't find ${req.originalUrl} on this server`));
